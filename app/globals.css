@@ -982,7 +982,18 @@ button {
 
 @media (max-width: 768px) {
   #offriamo {
-    padding: 80px 20px 56px;
+    /* Ancho completo: el padding lateral va al título */
+    padding: 80px 0 56px;
+  }
+
+  #offriamo .gallery-title {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  #offriamo .gallery-grid--mosaic {
+    max-width: none;
+    width: 100%;
   }
 }
 
@@ -1160,13 +1171,12 @@ button {
     grid-row: unset;
   }
 
-  .gallery-image-container--mosaic {
-    flex: none;
-    height: 220px;
-  }
-
+  /* Misma altura para todas las tarjetas (antes Carta era más alta) */
+  .gallery-image-container--mosaic,
   .gallery-mosaic__slot--carta .gallery-image-container--mosaic {
-    height: 280px;
+    flex: none;
+    height: 228px;
+    min-height: 228px;
   }
 }
 
@@ -1616,6 +1626,24 @@ button {
 .galleria-section__container {
   max-width: min(1440px, 96vw);
   margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .galleria-section {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .galleria-section__container {
+    max-width: none;
+    width: 100%;
+    margin: 0;
+  }
+
+  .galleria-section .gallery-title {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
 }
 
 /* Titolo come «Cosa offriamo» (.gallery-title) */
