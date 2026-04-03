@@ -637,25 +637,25 @@ button {
     gap: clamp(0.18rem, 1vw, 0.45rem);
   }
 
-  /* Portada solo texto: letras grandes según viewport (no cqi del carrusel) */
+  /* Portada solo texto: más aire entre letras/palabras (solo móvil; PC sin esta clase) */
   .tanta-hero__slide--mobile-text-cover .tanta-hero__blocks {
-    gap: clamp(0.45rem, 2.2vmin, 1rem);
+    gap: clamp(0.65rem, 3vmin, 1.35rem);
   }
 
   .tanta-hero__slide--mobile-text-cover .tanta-hero__blocks-row {
-    row-gap: clamp(0.4rem, 2vmin, 0.85rem);
+    row-gap: clamp(0.55rem, 2.6vmin, 1.15rem);
   }
 
   .tanta-hero__slide--mobile-text-cover .tanta-hero__blocks-wordgap {
-    flex-basis: clamp(0.4rem, 2vmin, 1rem);
+    flex-basis: clamp(0.55rem, 2.8vmin, 1.35rem);
   }
 
   .tanta-hero__slide--mobile-text-cover .tanta-hero__blocks-group {
-    gap: clamp(0.2rem, 1.4vmin, 0.55rem);
+    gap: clamp(0.3rem, 1.9vmin, 0.82rem);
   }
 
   .tanta-hero__slide--mobile-text-cover .tanta-hero__blk {
-    font-size: clamp(1.55rem, 5.2vmin + 1.25vw, 3rem);
+    font-size: clamp(1.85rem, 6.8vmin + 1.5vw, 3.45rem);
     box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.14);
   }
 }
@@ -668,7 +668,7 @@ button {
 
     /* La portada móvil no usa cqi: el selector gana por especificidad */
     .tanta-hero__slide--mobile-text-cover .tanta-hero__blk {
-      font-size: clamp(1.55rem, 5.2vmin + 1.25vw, 3rem);
+      font-size: clamp(1.85rem, 6.8vmin + 1.5vw, 3.45rem);
     }
   }
 }

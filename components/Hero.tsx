@@ -10,8 +10,9 @@ import {
   useState,
 } from "react";
 
-/* Carrusel hero — imágenes en /public */
-const SLIDES = ["/hero1b.webp", "/hero2.png", "/hero3b.png", "/hero4.JPG"];
+/* Escritorio: 4 fotos. Móvil: sin hero3b; orden 1, 2, /lb.jpg, hero4 */
+const SLIDES_DESKTOP = ["/hero1b.webp", "/hero2.png", "/hero3b.png", "/hero4.JPG"];
+const SLIDE_MOBILE_EXTRA = "/lb.jpg";
 
 const AUTO_MS = 5000;
 /** Móvil: tiempo con solo letras (portada) antes de mostrar la foto de la 1ª slide */
@@ -53,7 +54,7 @@ const PALETTE: { bg: string; fg: string }[] = [
 
 type BlockCell = { ch: string; bg: string; fg: string };
 
-function useWordCells() {
+function useWordCells(layout: "standard" | "mobile-stacked") {
   return useMemo(() => {
     let i = 0;
     const cell = (ch: string): BlockCell => {
@@ -64,14 +65,29 @@ function useWordCells() {
     const word = (w: string): BlockCell[] =>
       w.split("").map((c) => cell(c === "’" || c === "'" ? "'" : c));
 
-    const rows: BlockCell[][][] = [
+    if (layout === "mobile-stacked") {
+      return [
+        [word("LA")],
+        [word("NOSTRA")],
+        [word("FILOSOFIA")],
+        [word("SI")],
+        [word("BASA")],
+        [word("SULL'USO")],
+        [word("DI")],
+        [word("INGREDIENTI")],
+        [word("FRESCHI")],
+        [word("E")],
+        [word("STAGIONALI")],
+      ];
+    }
+
+    return [
       [word("LA"), word("NOSTRA"), word("FILOSOFIA")],
       [word("SI"), word("BASA"), word("SULL'USO")],
       [word("DI"), word("INGREDIENTI")],
       [word("FRESCHI"), word("E"), word("STAGIONALI")],
     ];
-    return rows;
-  }, []);
+  }, [layout]);
 }
 
 function BlockWord({ cells }: { cells: BlockCell[] }) {
@@ -90,8 +106,12 @@ function BlockWord({ cells }: { cells: BlockCell[] }) {
   );
 }
 
-function HeroHeadline() {
-  const rows = useWordCells();
+function HeroHeadline({
+  layout = "standard",
+}: {
+  layout?: "standard" | "mobile-stacked";
+}) {
+  const rows = useWordCells(layout);
 
   return (
     <div className="tanta-hero__headline">
@@ -115,10 +135,27 @@ function HeroHeadline() {
 
 export function Hero() {
   const isMobile = useIsMobileHero();
+  const slides = useMemo(
+    () =>
+      isMobile
+        ? [
+            SLIDES_DESKTOP[0],
+            SLIDES_DESKTOP[1],
+            SLIDE_MOBILE_EXTRA,
+            SLIDES_DESKTOP[3],
+          ]
+        : SLIDES_DESKTOP,
+    [isMobile]
+  );
+
   const [index, setIndex] = useState(0);
   /** Móvil + slide 0: false = solo letras (portada); true = solo imagen hero1 */
   const [mobileSlide0ShowImage, setMobileSlide0ShowImage] = useState(false);
   const prevIndexRef = useRef(-1);
+
+  useEffect(() => {
+    setIndex((i) => Math.min(i, Math.max(0, slides.length - 1)));
+  }, [slides.length, isMobile]);
 
   useEffect(() => {
     if (!isMobile) {
@@ -136,11 +173,11 @@ export function Hero() {
   useEffect(() => {
     if (isMobile) return;
     const id = window.setInterval(
-      () => setIndex((i) => (i + 1) % SLIDES.length),
+      () => setIndex((i) => (i + 1) % slides.length),
       AUTO_MS
     );
     return () => clearInterval(id);
-  }, [isMobile]);
+  }, [isMobile, slides.length]);
 
   useEffect(() => {
     if (!isMobile) return;
@@ -158,11 +195,11 @@ export function Hero() {
     }
 
     const id = window.setTimeout(
-      () => setIndex((i) => (i + 1) % SLIDES.length),
+      () => setIndex((i) => (i + 1) % slides.length),
       AUTO_MS
     );
     return () => clearTimeout(id);
-  }, [isMobile, index, mobileSlide0ShowImage]);
+  }, [isMobile, index, mobileSlide0ShowImage, slides.length]);
 
   return (
     <section className="tanta-hero" aria-label="Inicio">
@@ -174,12 +211,12 @@ export function Hero() {
         <div
           className="tanta-hero__track"
           style={{
-            width: `${SLIDES.length * 100}%`,
-            transform: `translateX(-${(100 / SLIDES.length) * index}%)`,
+            width: `${slides.length * 100}%`,
+            transform: `translateX(-${(100 / slides.length) * index}%)`,
             transition: "transform 0.65s ease",
           }}
         >
-          {SLIDES.map((src, i) => {
+          {slides.map((src, i) => {
             const isFirst = i === 0;
             const desktopSplit = isFirst && !isMobile;
             const mobileTextCover = isFirst && isMobile && !mobileSlide0ShowImage;
@@ -197,7 +234,7 @@ export function Hero() {
               <div
                 key={src}
                 className={slideClass}
-                style={{ flex: `0 0 ${100 / SLIDES.length}%` }}
+                style={{ flex: `0 0 ${100 / slides.length}%` }}
                 aria-hidden={i !== index}
               >
                 {desktopSplit ? (
@@ -220,7 +257,7 @@ export function Hero() {
 
                 {mobileTextCover ? (
                   <div className="tanta-hero__slide-copy tanta-hero__slide-copy--mobile-full">
-                    <HeroHeadline />
+                    <HeroHeadline layout="mobile-stacked" />
                   </div>
                 ) : null}
 
