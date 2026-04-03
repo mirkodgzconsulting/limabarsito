@@ -1,13 +1,13 @@
 /* Inspirado en la estructura y tokens visuales públicos de https://tantaperu.com/ */
 /*
  * Tipografías del proyecto:
- * - Títulos: Trade Gothic → public/fonts/trade-gothic.woff2 (mismo archivo sirve para 400 y 700)
+ * - Títulos: Trade Gothic LT → public/fonts/trade-gothic.woff2 (mismo archivo sirve para 400 y 700)
  * - Textos: Flame Sans → añade public/fonts/flame-sans.woff2
  * Si faltan los archivos, el navegador usará las fuentes de reserva indicadas abajo.
  */
 
 @font-face {
-  font-family: "Trade Gothic";
+  font-family: "Trade Gothic LT";
   src: url("/fonts/trade-gothic.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
@@ -15,7 +15,7 @@
 }
 
 @font-face {
-  font-family: "Trade Gothic";
+  font-family: "Trade Gothic LT";
   src: url("/fonts/trade-gothic.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
@@ -67,7 +67,7 @@
   /* Enlaces del header (Menu · Galleria) */
   --nav-gold: #b8860b;
   --nav-gold-hover: #9a7208;
-  --font-display: "Trade Gothic", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Trade Gothic LT", "Trade Gothic", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
   --font-body: "Flame Sans", "Segoe UI", system-ui, sans-serif;
 }
 
@@ -255,7 +255,7 @@ button {
 
 #page-header .nav-desktop a.nav-link {
   color: var(--nav-gold);
-  text-transform: uppercase;
+  text-transform: none;
   font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -387,7 +387,7 @@ button {
 
 .mobile-drawer a {
   color: var(--nav-gold);
-  text-transform: uppercase;
+  text-transform: none;
   font-weight: 700;
   font-size: 1.15rem;
   letter-spacing: 0.05em;
@@ -678,7 +678,7 @@ button {
   font-weight: 400;
   line-height: 40px;
   text-align: center;
-  text-transform: uppercase;
+  text-transform: none;
   margin: 0 0 1.5rem;
 }
 
