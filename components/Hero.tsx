@@ -209,8 +209,7 @@ export function Hero() {
                       <Image
                         src={src}
                         alt=""
-                        width={1920}
-                        height={1080}
+                        fill
                         priority
                         sizes="(max-width: 991px) 100vw, 50vw"
                         className="tanta-hero__slide-img"
@@ -230,8 +229,7 @@ export function Hero() {
                     <Image
                       src={src}
                       alt=""
-                      width={1920}
-                      height={1080}
+                      fill
                       priority
                       sizes="100vw"
                       className="tanta-hero__slide-img"
@@ -244,8 +242,7 @@ export function Hero() {
                     <Image
                       src={src}
                       alt=""
-                      width={1920}
-                      height={1080}
+                      fill
                       priority={i === 1}
                       sizes="100vw"
                       className="tanta-hero__slide-img"
