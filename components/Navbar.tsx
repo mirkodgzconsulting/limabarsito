@@ -76,14 +76,6 @@ export function Navbar() {
         onClick={close}
       />
       <div className={`mobile-drawer ${open ? "is-open" : ""}`} role="dialog" aria-modal>
-        <button
-          type="button"
-          className="mobile-drawer__close"
-          aria-label="Chiudi menu"
-          onClick={close}
-        >
-          ×
-        </button>
         <Link href="/#noi" onClick={close}>
           Noi
         </Link>

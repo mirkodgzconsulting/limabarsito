@@ -381,29 +381,6 @@ button {
   box-shadow: -8px 0 32px rgba(0, 0, 0, 0.1);
 }
 
-.mobile-drawer__close {
-  align-self: flex-end;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  margin: -0.25rem -0.35rem 0.25rem 0;
-  font-size: 1.75rem;
-  line-height: 1;
-  color: var(--nav-gold);
-  background: transparent;
-  border: 2px solid var(--nav-gold);
-  border-radius: 50%;
-  cursor: pointer;
-  font-weight: 300;
-}
-
-.mobile-drawer__close:hover {
-  color: var(--nav-gold-hover);
-  border-color: var(--nav-gold-hover);
-}
-
 .mobile-drawer.is-open {
   transform: translateX(0);
 }
