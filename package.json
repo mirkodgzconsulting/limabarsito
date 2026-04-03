@@ -6,8 +6,11 @@
     "node": ">=20.0.0"
   },
   "scripts": {
+    "clean": "node -e \"const fs=require('fs');try{fs.rmSync('.next',{recursive:true,force:true});console.log('Removed .next');}catch(e){if(e.code!=='ENOENT')throw e;}\"",
     "dev": "next dev",
+    "dev:clean": "npm run clean && next dev",
     "build": "next build",
+    "build:clean": "npm run clean && next build",
     "start": "next start",
     "lint": "next lint"
   },

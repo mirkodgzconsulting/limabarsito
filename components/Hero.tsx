@@ -1,12 +1,39 @@
 "use client";
 
 import Image from "next/image";
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Fragment,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 /* Carrusel hero — imágenes en /public */
 const SLIDES = ["/hero1b.webp", "/hero2.png", "/hero3b.png", "/hero4.JPG"];
 
 const AUTO_MS = 5000;
+/** Móvil: tiempo con solo letras (portada) antes de mostrar la foto de la 1ª slide */
+const MOBILE_TEXT_COVER_MS = 4200;
+
+/** Mismo corte que el menú hamburguesa (992px): evita split en tablet vertical */
+const MQ_MOBILE = "(max-width: 991px)";
+
+function useIsMobileHero() {
+  /** true hasta medir viewport: si empezamos en false, SSR/1er paint usa split de desktop y en ≤991px se ve texto+imagen (mal). */
+  const [isMobile, setIsMobile] = useState(true);
+
+  useLayoutEffect(() => {
+    const mq = window.matchMedia(MQ_MOBILE);
+    const apply = () => setIsMobile(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+
+  return isMobile;
+}
 
 /** Paleta tipo hero anterior: fondos vivos + texto contrastado */
 const PALETTE: { bg: string; fg: string }[] = [
@@ -87,14 +114,55 @@ function HeroHeadline() {
 }
 
 export function Hero() {
+  const isMobile = useIsMobileHero();
   const [index, setIndex] = useState(0);
-
-  const next = useCallback(() => setIndex((i) => (i + 1) % SLIDES.length), []);
+  /** Móvil + slide 0: false = solo letras (portada); true = solo imagen hero1 */
+  const [mobileSlide0ShowImage, setMobileSlide0ShowImage] = useState(false);
+  const prevIndexRef = useRef(-1);
 
   useEffect(() => {
-    const id = setInterval(next, AUTO_MS);
+    if (!isMobile) {
+      setMobileSlide0ShowImage(true);
+    }
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (isMobile && index === 0 && prevIndexRef.current > 0) {
+      setMobileSlide0ShowImage(false);
+    }
+    prevIndexRef.current = index;
+  }, [isMobile, index]);
+
+  useEffect(() => {
+    if (isMobile) return;
+    const id = window.setInterval(
+      () => setIndex((i) => (i + 1) % SLIDES.length),
+      AUTO_MS
+    );
     return () => clearInterval(id);
-  }, [next]);
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (!isMobile) return;
+
+    if (index === 0 && !mobileSlide0ShowImage) {
+      const id = window.setTimeout(() => {
+        setMobileSlide0ShowImage(true);
+      }, MOBILE_TEXT_COVER_MS);
+      return () => clearTimeout(id);
+    }
+
+    if (index === 0 && mobileSlide0ShowImage) {
+      const id = window.setTimeout(() => setIndex(1), AUTO_MS);
+      return () => clearTimeout(id);
+    }
+
+    const id = window.setTimeout(
+      () => setIndex((i) => (i + 1) % SLIDES.length),
+      AUTO_MS
+    );
+    return () => clearTimeout(id);
+  }, [isMobile, index, mobileSlide0ShowImage]);
 
   return (
     <section className="tanta-hero" aria-label="Inicio">
@@ -112,38 +180,78 @@ export function Hero() {
           }}
         >
           {SLIDES.map((src, i) => {
-            const isSplit = i === 0;
+            const isFirst = i === 0;
+            const desktopSplit = isFirst && !isMobile;
+            const mobileTextCover = isFirst && isMobile && !mobileSlide0ShowImage;
+            const mobileFirstImage = isFirst && isMobile && mobileSlide0ShowImage;
+
+            const slideClass = [
+              "tanta-hero__slide",
+              desktopSplit ? "tanta-hero__slide--split" : "",
+              mobileTextCover ? "tanta-hero__slide--mobile-text-cover" : "",
+            ]
+              .filter(Boolean)
+              .join(" ");
+
             return (
               <div
                 key={src}
-                className={
-                  isSplit
-                    ? "tanta-hero__slide tanta-hero__slide--split"
-                    : "tanta-hero__slide"
-                }
+                className={slideClass}
                 style={{ flex: `0 0 ${100 / SLIDES.length}%` }}
                 aria-hidden={i !== index}
               >
-                {isSplit ? (
-                  <div className="tanta-hero__slide-copy">
+                {desktopSplit ? (
+                  <>
+                    <div className="tanta-hero__slide-copy">
+                      <HeroHeadline />
+                    </div>
+                    <div className="tanta-hero__slide-visual">
+                      <Image
+                        src={src}
+                        alt=""
+                        width={1920}
+                        height={1080}
+                        priority
+                        sizes="(max-width: 991px) 100vw, 50vw"
+                        className="tanta-hero__slide-img"
+                      />
+                    </div>
+                  </>
+                ) : null}
+
+                {mobileTextCover ? (
+                  <div className="tanta-hero__slide-copy tanta-hero__slide-copy--mobile-full">
                     <HeroHeadline />
                   </div>
                 ) : null}
-                <div className="tanta-hero__slide-visual">
-                  <Image
-                    src={src}
-                    alt=""
-                    width={1920}
-                    height={1080}
-                    priority={i === 0}
-                    sizes={
-                      isSplit
-                        ? "(max-width: 768px) 100vw, 50vw"
-                        : "100vw"
-                    }
-                    className="tanta-hero__slide-img"
-                  />
-                </div>
+
+                {mobileFirstImage ? (
+                  <div className="tanta-hero__slide-visual">
+                    <Image
+                      src={src}
+                      alt=""
+                      width={1920}
+                      height={1080}
+                      priority
+                      sizes="100vw"
+                      className="tanta-hero__slide-img"
+                    />
+                  </div>
+                ) : null}
+
+                {!isFirst ? (
+                  <div className="tanta-hero__slide-visual">
+                    <Image
+                      src={src}
+                      alt=""
+                      width={1920}
+                      height={1080}
+                      priority={i === 1}
+                      sizes="100vw"
+                      className="tanta-hero__slide-img"
+                    />
+                  </div>
+                ) : null}
               </div>
             );
           })}

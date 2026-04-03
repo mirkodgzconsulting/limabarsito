@@ -150,12 +150,12 @@ button {
   border: 0;
 }
 
-/* —— Main offset (header fijo 80px, como tanta.com) —— */
+/* —— Main offset (header fijo; mismo corte que #page-header 991px) —— */
 #main-content {
   padding-top: var(--header-h);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 991px) {
   #main-content {
     padding-top: var(--header-h-mobile);
   }
@@ -396,9 +396,17 @@ button {
   --slide-h: 520px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 991px) {
   .tanta-hero {
-    --slide-h: 560px;
+    /*
+     * Sin padding-top aquí: #main-content ya deja hueco para el header fijo.
+     * Duplicarlo creaba ~72px de franja crema entre header e imagen al pasar del texto a la foto.
+     */
+    background-color: #f1ebe0;
+    /* Un poco menos que pantalla completa bajo el header */
+    --slide-h: calc(
+      100svh - var(--header-h-mobile) - env(safe-area-inset-bottom, 0px) - 44px
+    );
   }
 }
 
@@ -527,22 +535,63 @@ button {
   object-position: center center;
 }
 
-@media (max-width: 768px) {
+/*
+ * Red de seguridad: si la 1ª slide vuelve a renderizarse como split bajo ≤991px,
+ * sin esto quedan 2 columnas estrechas (texto + imagen apilados).
+ */
+@media (max-width: 991px) {
   .tanta-hero__slide--split {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto minmax(0, 1fr);
     height: var(--slide-h);
+    align-content: stretch;
   }
 
   .tanta-hero__slide--split .tanta-hero__slide-copy {
-    padding: 0.75rem 0.65rem 0.6rem;
     order: 1;
-    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+    overflow-y: visible;
+    padding: 0.65rem 0.85rem 0.5rem;
   }
 
   .tanta-hero__slide--split .tanta-hero__slide-visual {
     order: 2;
+    width: 100%;
     min-height: 0;
+  }
+}
+
+/* Móvil/tablet: 1ª slide con JS = solo letras (portada) y luego solo imagen */
+@media (max-width: 991px) {
+  .tanta-hero__slide--mobile-text-cover {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    height: var(--slide-h);
+    width: 100%;
+    background: #f1ebe0;
+  }
+
+  .tanta-hero__slide--mobile-text-cover .tanta-hero__slide-copy--mobile-full {
+    /* Sin container-type: dentro del track flex las cqi a veces = ancho ~0 → letras minúsculas */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    max-height: none;
+    flex: 1 1 auto;
+    align-self: stretch;
+    padding: clamp(0.65rem, 2.5vmin, 1.1rem) clamp(0.5rem, 2vw, 0.9rem);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
   }
 
   .tanta-hero__headline {
@@ -557,15 +606,38 @@ button {
     gap: clamp(0.18rem, 1vw, 0.45rem);
   }
 
-  .tanta-hero__slide--split .tanta-hero__slide-img {
-    object-position: center center;
+  /* Portada solo texto: letras grandes según viewport (no cqi del carrusel) */
+  .tanta-hero__slide--mobile-text-cover .tanta-hero__blocks {
+    gap: clamp(0.45rem, 2.2vmin, 1rem);
+  }
+
+  .tanta-hero__slide--mobile-text-cover .tanta-hero__blocks-row {
+    row-gap: clamp(0.4rem, 2vmin, 0.85rem);
+  }
+
+  .tanta-hero__slide--mobile-text-cover .tanta-hero__blocks-wordgap {
+    flex-basis: clamp(0.4rem, 2vmin, 1rem);
+  }
+
+  .tanta-hero__slide--mobile-text-cover .tanta-hero__blocks-group {
+    gap: clamp(0.2rem, 1.4vmin, 0.55rem);
+  }
+
+  .tanta-hero__slide--mobile-text-cover .tanta-hero__blk {
+    font-size: clamp(1.55rem, 5.2vmin + 1.25vw, 3rem);
+    box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.14);
   }
 }
 
 @supports (font-size: 1cqi) {
-  @media (max-width: 768px) {
+  @media (max-width: 991px) {
     .tanta-hero__blk {
       font-size: clamp(1.05rem, 7.5cqi + 0.3rem, 2.25rem);
+    }
+
+    /* La portada móvil no usa cqi: el selector gana por especificidad */
+    .tanta-hero__slide--mobile-text-cover .tanta-hero__blk {
+      font-size: clamp(1.55rem, 5.2vmin + 1.25vw, 3rem);
     }
   }
 }
@@ -584,7 +656,7 @@ button {
 
 @media (max-width: 768px) {
   #section-bg-animation {
-    padding: 72px 20px;
+    padding: 88px 20px 72px;
     display: flex;
     flex-direction: column;
     gap: 2rem;
